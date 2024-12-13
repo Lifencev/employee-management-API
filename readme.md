@@ -1,3 +1,8 @@
+In this project, I added a `create-container-and-test` script that:
+1. Builds and runs the container using Docker Compose.
+2. Runs tests using Newman.
+3. Stops and removes containers, along with associated volumes
+
 
 # Employee Management API
 
