@@ -9,6 +9,7 @@
     "start": "cross-env NODE_ENV=production node app.js",
     "dev": "cross-env NODE_ENV=development nodemon app.js",
     "test": "cross-env NODE_ENV=test mocha tests/**/*.test.js --exit",
+    "create-container-and-test": "docker-compose up --build -d && newman run Employee_Management_API.postman_collection.json & docker-compose down -v",
     "seed:prod": "cross-env NODE_ENV=production npx sequelize-cli db:seed:all",
     "seed:dev": "cross-env NODE_ENV=development npx sequelize-cli db:seed:all",
     "clear-db:prod": "cross-env NODE_ENV=production npx sequelize-cli db:seed:undo:all",
@@ -28,6 +29,7 @@
   "author": "Alex",
   "license": "MIT",
   "dependencies": {
+    "@faker-js/faker": "^9.0.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
@@ -40,11 +42,11 @@
     "node-schedule": "^2.1.1",
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
+    "postman-code-generators": "^1.14.0",
     "sequelize": "^6.37.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.3",
-    "winston": "^3.9.0",
-    "@faker-js/faker": "^9.0.1"
+    "winston": "^3.9.0"
   },
   "devDependencies": {
     "chai": "^4.3.7",

@@ -1,20 +1,22 @@
-# Используем базовый образ Node.js
+# Use Node.js as the base image
 FROM node:16
 
-# Устанавливаем рабочую директорию внутри контейнера
+# Create app directory
 WORKDIR /app
 
-# Копируем package.json и package-lock.json
+# Install app dependencies
 COPY package*.json ./
-
-# Устанавливаем зависимости
 RUN npm install
+RUN npm install -g newman
 
-# Копируем остальной код приложения
+# Bundle app source
 COPY . .
 
-# Указываем порт, который будет использоваться
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Команда для запуска приложения
+# Define environment variable
+ENV NODE_ENV=production
+
+# Start the app
 CMD ["npm", "start"]

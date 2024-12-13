@@ -1,0 +1,1020 @@
+{
+	"info": {
+		"_postman_id": "a4796740-d151-485e-bd17-8f05d0c4fabe",
+		"name": "Employee Management API",
+		"description": "Several test cases that test the Employee Management API:  \n[https://github.com/dreamquality/employee-management-api](https://github.com/dreamquality/employee-management-api)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27975718"
+	},
+	"item": [
+		{
+			"name": "Register a new user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains valid Schema\", function () {\r",
+							"    const schema = pm.collectionVariables.get(\"successfulRegistrationSchema\");\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message says user was successfully registered\", function () {\r",
+							"    const jsonData = pm.response.json(); \r",
+							"    pm.expect(jsonData.message).to.eql(\"Пользователь успешно зарегистрирован\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const successfulRegistrationSchema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"userId\": {\r",
+							"      \"type\": \"integer\"\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\",\r",
+							"    \"userId\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"successfulRegistrationSchema\", successfulRegistrationSchema);\r",
+							"\r",
+							"const timestamp = Date.now();\r",
+							"const randomPart = Math.random().toString(36).substring(2, 8);\r",
+							"const uniqueEmail = `user_${timestamp}_${randomPart}@example.com`; \r",
+							"\r",
+							"pm.environment.set(\"uniqueUserEmail\", uniqueEmail);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{uniqueUserEmail}}\",\r\n  \"password\": \"{{userPassword}}\",\r\n  \"firstName\": \"Ursula\",\r\n  \"lastName\": \"von der Leyen\",\r\n  \"middleName\": \"Gertrud\",\r\n  \"birthDate\": \"1958-10-08\",\r\n  \"phone\": \"+49617888238\",\r\n  \"programmingLanguage\": \"Deutsch\",\r\n  \"role\": \"admin\",\r\n  \"secretWord\": \"vierundsechzigneun\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login a new user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const tokenSchema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"token\": {\r",
+							"      \"type\": \"string\"\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"token\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"tokenSchema\", tokenSchema);\r",
+							"pm.collectionVariables.get(\"uniqueUserEmail\");\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains valid Schema\", function () {\r",
+							"    const schema = pm.collectionVariables.get(\"tokenSchema\");\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains a valid JWT\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const token = jsonData.token;\r",
+							"    pm.expect(token).to.not.be.undefined;\r",
+							"    pm.expect(token).to.be.a(\"string\");\r",
+							"    const parts = token.split(\".\");\r",
+							"    pm.expect(parts.length).to.eql(3);\r",
+							"    pm.collectionVariables.set(\"token\", token);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{uniqueUserEmail}}\",\r\n  \"password\": \"{{userPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new employee",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const employeeSchema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"user\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"registrationDate\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"lastSalaryIncreaseDate\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"hireDate\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"id\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"email\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"password\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"firstName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"lastName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"middleName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"birthDate\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"phone\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"programmingLanguage\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"country\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"bankCard\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"linkedinLink\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"adminNote\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"currentProject\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"englishLevel\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"githubLink\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"vacationDates\": {\r",
+							"          \"type\": \"array\",\r",
+							"          \"items\": [\r",
+							"            {\r",
+							"              \"type\": \"string\"\r",
+							"            }\r",
+							"          ]\r",
+							"        },\r",
+							"        \"mentorName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"position\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"salary\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"role\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"workingHoursPerWeek\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"updatedAt\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"createdAt\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"lastLoginDate\": {\r",
+							"          \"type\": \"null\"\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"registrationDate\",\r",
+							"        \"lastSalaryIncreaseDate\",\r",
+							"        \"hireDate\",\r",
+							"        \"id\",\r",
+							"        \"email\",\r",
+							"        \"password\",\r",
+							"        \"firstName\",\r",
+							"        \"lastName\",\r",
+							"        \"middleName\",\r",
+							"        \"birthDate\",\r",
+							"        \"phone\",\r",
+							"        \"programmingLanguage\",\r",
+							"        \"country\",\r",
+							"        \"bankCard\",\r",
+							"        \"linkedinLink\",\r",
+							"        \"adminNote\",\r",
+							"        \"currentProject\",\r",
+							"        \"englishLevel\",\r",
+							"        \"githubLink\",\r",
+							"        \"vacationDates\",\r",
+							"        \"mentorName\",\r",
+							"        \"position\",\r",
+							"        \"salary\",\r",
+							"        \"role\",\r",
+							"        \"workingHoursPerWeek\",\r",
+							"        \"updatedAt\",\r",
+							"        \"createdAt\",\r",
+							"        \"lastLoginDate\"\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\",\r",
+							"    \"user\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"employeeSchema\", employeeSchema);\r",
+							"\r",
+							"const timestamp = Date.now();\r",
+							"const randomPart = Math.random().toString(36).substring(2, 8);\r",
+							"const uniqueEmail = `user_${timestamp}_${randomPart}@example.com`; \r",
+							"\r",
+							"pm.environment.set(\"uniqueEmployeeEmail\", uniqueEmail);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains valid Schema\", function () {\r",
+							"    const schema = pm.collectionVariables.get(\"employeeSchema\");\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message says employee was successfully created\", function () {\r",
+							"    const jsonData = pm.response.json(); \r",
+							"    pm.expect(jsonData.message).to.eql(\"Сотрудник успешно создан\");\r",
+							"    const userId = jsonData.user.id;\r",
+							"    pm.collectionVariables.set(\"userId\", userId);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{uniqueEmployeeEmail}}\",\r\n  \"password\": \"macron228\",\r\n  \"firstName\": \"Emmanuel\",\r\n  \"lastName\": \"Macron\",\r\n  \"middleName\": \"Ivanovich\",\r\n  \"birthDate\": \"1974-10-05\",\r\n  \"phone\": \"+4141310912\",\r\n  \"programmingLanguage\": \"Perl\",\r\n  \"country\": \"France\",\r\n  \"bankCard\": \"4440131304019419042\",\r\n  \"registrationDate\": \"2024-12-11T19:37:53.347Z\",\r\n  \"lastLoginDate\": \"2024-12-11T19:37:53.347Z\",\r\n  \"salary\": 1120,\r\n  \"lastSalaryIncreaseDate\": \"2024-12-11T19:37:53.347Z\",\r\n  \"position\": \"engineer\",\r\n  \"mentorName\": \"Alex\",\r\n  \"vacationDates\": [\r\n    \"2024-12-11\"\r\n  ],\r\n  \"githubLink\": \"https://github.com/dreamquality/employee-management-api\",\r\n  \"linkedinLink\": \"https://www.linkedin.com/feed/\",\r\n  \"adminNote\": \"he is goot\",\r\n  \"currentProject\": \"paris\",\r\n  \"englishLevel\": \"enough\",\r\n  \"workingHoursPerWeek\": 40,\r\n  \"role\": \"employee\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get 3 last registered users",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const usersListSchema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"users\": {\r",
+							"      \"type\": \"array\",\r",
+							"      \"items\": [\r",
+							"        {\r",
+							"          \"type\": \"object\",\r",
+							"          \"properties\": {\r",
+							"            \"id\": {\r",
+							"              \"type\": \"integer\"\r",
+							"            },\r",
+							"            \"firstName\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"lastName\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"middleName\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"birthDate\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"phone\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"email\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"programmingLanguage\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"country\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"bankCard\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"password\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"role\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"registrationDate\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"lastLoginDate\": {\r",
+							"              \"type\": \"null\"\r",
+							"            },\r",
+							"            \"salary\": {\r",
+							"              \"type\": \"integer\"\r",
+							"            },\r",
+							"            \"lastSalaryIncreaseDate\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"position\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"mentorName\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"vacationDates\": {\r",
+							"              \"type\": \"array\",\r",
+							"              \"items\": [\r",
+							"                {\r",
+							"                  \"type\": \"string\"\r",
+							"                }\r",
+							"              ]\r",
+							"            },\r",
+							"            \"githubLink\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"linkedinLink\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"adminNote\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"currentProject\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"englishLevel\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"workingHoursPerWeek\": {\r",
+							"              \"type\": \"integer\"\r",
+							"            },\r",
+							"            \"hireDate\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"createdAt\": {\r",
+							"              \"type\": \"string\"\r",
+							"            },\r",
+							"            \"updatedAt\": {\r",
+							"              \"type\": \"string\"\r",
+							"            }\r",
+							"          },\r",
+							"          \"required\": [\r",
+							"            \"id\",\r",
+							"            \"firstName\",\r",
+							"            \"lastName\",\r",
+							"            \"middleName\",\r",
+							"            \"birthDate\",\r",
+							"            \"phone\",\r",
+							"            \"email\",\r",
+							"            \"programmingLanguage\",\r",
+							"            \"country\",\r",
+							"            \"bankCard\",\r",
+							"            \"password\",\r",
+							"            \"role\",\r",
+							"            \"registrationDate\",\r",
+							"            \"lastLoginDate\",\r",
+							"            \"salary\",\r",
+							"            \"lastSalaryIncreaseDate\",\r",
+							"            \"position\",\r",
+							"            \"mentorName\",\r",
+							"            \"vacationDates\",\r",
+							"            \"githubLink\",\r",
+							"            \"linkedinLink\",\r",
+							"            \"adminNote\",\r",
+							"            \"currentProject\",\r",
+							"            \"englishLevel\",\r",
+							"            \"workingHoursPerWeek\",\r",
+							"            \"hireDate\",\r",
+							"            \"createdAt\",\r",
+							"            \"updatedAt\"\r",
+							"          ]\r",
+							"        }\r",
+							"      ]\r",
+							"    },\r",
+							"    \"total\": {\r",
+							"      \"type\": \"integer\"\r",
+							"    },\r",
+							"    \"page\": {\r",
+							"      \"type\": \"integer\"\r",
+							"    },\r",
+							"    \"totalPages\": {\r",
+							"      \"type\": \"integer\"\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"users\",\r",
+							"    \"total\",\r",
+							"    \"page\",\r",
+							"    \"totalPages\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"usersListSchema\", usersListSchema);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains valid Schema\", function () {\r",
+							"    const schema = pm.collectionVariables.get(\"usersListSchema\");\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains 3 users sorted by registrationDate DESC\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const users = jsonData.users;\r",
+							"    pm.expect(users.length).to.eql(3);\r",
+							"\r",
+							"    for (let i = 0; i < users.length - 1; i++) {\r",
+							"        const current = new Date(users[i].registrationDate);\r",
+							"        const next = new Date(users[i + 1].registrationDate);\r",
+							"        pm.expect(current.getTime()).to.be.at.least(next.getTime());\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users?page=1&limit=3&sortBy=registrationDate&order=DESC",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "sortBy",
+							"value": "registrationDate"
+						},
+						{
+							"key": "order",
+							"value": "DESC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update an employee's phone number",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const userProfileSchema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    },\r",
+							"    \"user\": {\r",
+							"      \"type\": \"object\",\r",
+							"      \"properties\": {\r",
+							"        \"id\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"firstName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"lastName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"middleName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"birthDate\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"phone\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"email\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"programmingLanguage\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"country\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"bankCard\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"registrationDate\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"lastLoginDate\": {\r",
+							"          \"type\": [\"string\", \"null\"]\r",
+							"        },\r",
+							"        \"salary\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"lastSalaryIncreaseDate\": {\r",
+							"          \"type\": [\"string\", \"null\"]\r",
+							"        },\r",
+							"        \"position\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"mentorName\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"vacationDates\": {\r",
+							"          \"type\": \"array\",\r",
+							"          \"items\": [\r",
+							"            {\r",
+							"              \"type\": \"string\"\r",
+							"            }\r",
+							"          ]\r",
+							"        },\r",
+							"        \"githubLink\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"linkedinLink\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"adminNote\": {\r",
+							"          \"type\": [\"string\", \"null\"]\r",
+							"        },\r",
+							"        \"currentProject\": {\r",
+							"          \"type\": [\"string\", \"null\"]\r",
+							"        },\r",
+							"        \"englishLevel\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"workingHoursPerWeek\": {\r",
+							"          \"type\": \"integer\"\r",
+							"        },\r",
+							"        \"role\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"password\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"createdAt\": {\r",
+							"          \"type\": \"string\"\r",
+							"        },\r",
+							"        \"updatedAt\": {\r",
+							"          \"type\": [\"string\", \"null\"]\r",
+							"        }\r",
+							"      },\r",
+							"      \"required\": [\r",
+							"        \"id\",\r",
+							"        \"firstName\",\r",
+							"        \"lastName\",\r",
+							"        \"middleName\",\r",
+							"        \"birthDate\",\r",
+							"        \"phone\",\r",
+							"        \"email\",\r",
+							"        \"programmingLanguage\",\r",
+							"        \"country\",\r",
+							"        \"bankCard\",\r",
+							"        \"registrationDate\",\r",
+							"        \"lastLoginDate\",\r",
+							"        \"salary\",\r",
+							"        \"lastSalaryIncreaseDate\",\r",
+							"        \"position\",\r",
+							"        \"mentorName\",\r",
+							"        \"vacationDates\",\r",
+							"        \"githubLink\",\r",
+							"        \"linkedinLink\",\r",
+							"        \"adminNote\",\r",
+							"        \"currentProject\",\r",
+							"        \"englishLevel\",\r",
+							"        \"workingHoursPerWeek\",\r",
+							"        \"role\",\r",
+							"        \"password\",\r",
+							"        \"createdAt\",\r",
+							"        \"updatedAt\"\r",
+							"      ]\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\",\r",
+							"    \"user\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"userProfileSchema\", userProfileSchema);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains valid Schema\", function () {\r",
+							"    const schema = pm.collectionVariables.get(\"userProfileSchema\");\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"User's phone number was updated\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const message = jsonData.message;\r",
+							"    const phoneNumber = jsonData.user.phone;\r",
+							"    const expectedPhoneNumber = pm.collectionVariables.get(\"newUserPhone\");\r",
+							"    \r",
+							"    pm.expect(message).to.eql(\"Данные обновлены\");\r",
+							"    pm.expect(phoneNumber).to.eql(expectedPhoneNumber);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"phone\": \"{{newUserPhone}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/{{userId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an employee by id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const userProfileSchema = {\r",
+							"  \"type\": \"object\",\r",
+							"  \"properties\": {\r",
+							"    \"message\": {\r",
+							"      \"type\": \"string\"\r",
+							"    }\r",
+							"  },\r",
+							"  \"required\": [\r",
+							"    \"message\"\r",
+							"  ]\r",
+							"}\r",
+							"\r",
+							"pm.collectionVariables.set(\"userProfileSchema\", userProfileSchema);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains valid Schema\", function () {\r",
+							"    const schema = pm.collectionVariables.get(\"userProfileSchema\");\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message says user was successfully deleted\", function () {\r",
+							"    const jsonData = pm.response.json(); \r",
+							"    pm.expect(jsonData.message).to.eql(\"Сотрудник успешно удален\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/{{userId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "userPassword",
+			"value": "ursula1958",
+			"type": "default"
+		},
+		{
+			"key": "userEmail",
+			"value": "ursula1958@gmail.com",
+			"type": "default"
+		},
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "default"
+		},
+		{
+			"key": "newUserPhone",
+			"value": "+380433221100",
+			"type": "default"
+		},
+		{
+			"key": "successfulRegistrationSchema",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "tokenSchema",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "employeeSchema",
+			"value": ""
+		},
+		{
+			"key": "employeeEmail",
+			"value": "macron@france.com",
+			"type": "default"
+		},
+		{
+			"key": "usersListSchema",
+			"value": ""
+		},
+		{
+			"key": "userProfileSchema",
+			"value": ""
+		}
+	]
+}
