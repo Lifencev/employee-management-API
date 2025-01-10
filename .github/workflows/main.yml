@@ -33,7 +33,7 @@ jobs:
       - name: Install Docker Compose plugin (v2)
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
+          sudo apt-get install -y docker-compose
           docker-compose up --build -d
 
       - name: Run Newman and create Report
