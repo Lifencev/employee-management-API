@@ -30,8 +30,11 @@ jobs:
           # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
           # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
   
-      - name: Docker build
-        run: docker-compose up --build -d
+      - name: Install Docker Compose plugin (v2)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin
+          docker-compose up --build -d
 
       - name: Run Newman and create Report
         run: newman run Employee_Management_API.postman_collection.json -r html --reporter-html-export "newman-report.html"
