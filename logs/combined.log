@@ -653,3 +653,45 @@
 2024-10-03 17:00:00 [INFO]: Проверка дня рождения для Default Admin, осталось дней: 90 
 2024-10-03 17:00:00 [INFO]: Проверка повышения зарплаты для Default Admin, осталось дней: 182 
 2024-10-03 17:00:00 [INFO]: Удалено 0 старых прочитанных уведомлений 
+2024-12-26 00:23:37 [ERROR]: Ошибка синхронизации базы данных: relation "public.Users" does not exist {
+  "name": "SequelizeDatabaseError",
+  "parent": {
+    "length": 110,
+    "name": "error",
+    "severity": "ERROR",
+    "code": "42P01",
+    "file": "namespace.c",
+    "line": "432",
+    "routine": "RangeVarGetRelidExtended",
+    "sql": "CREATE TABLE IF NOT EXISTS \"public\".\"Notifications\" (\"id\"   SERIAL , \"message\" VARCHAR(255) NOT NULL, \"userId\" INTEGER NOT NULL REFERENCES \"public\".\"Users\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE, \"relatedUserId\" INTEGER NOT NULL REFERENCES \"public\".\"Users\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE, \"isRead\" BOOLEAN DEFAULT false, \"type\" VARCHAR(255) NOT NULL DEFAULT 'general', \"eventDate\" TIMESTAMP WITH TIME ZONE, \"createdAt\" TIMESTAMP WITH TIME ZONE NOT NULL, \"updatedAt\" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY (\"id\"));"
+  },
+  "original": {
+    "length": 110,
+    "name": "error",
+    "severity": "ERROR",
+    "code": "42P01",
+    "file": "namespace.c",
+    "line": "432",
+    "routine": "RangeVarGetRelidExtended",
+    "sql": "CREATE TABLE IF NOT EXISTS \"public\".\"Notifications\" (\"id\"   SERIAL , \"message\" VARCHAR(255) NOT NULL, \"userId\" INTEGER NOT NULL REFERENCES \"public\".\"Users\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE, \"relatedUserId\" INTEGER NOT NULL REFERENCES \"public\".\"Users\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE, \"isRead\" BOOLEAN DEFAULT false, \"type\" VARCHAR(255) NOT NULL DEFAULT 'general', \"eventDate\" TIMESTAMP WITH TIME ZONE, \"createdAt\" TIMESTAMP WITH TIME ZONE NOT NULL, \"updatedAt\" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY (\"id\"));"
+  },
+  "sql": "CREATE TABLE IF NOT EXISTS \"public\".\"Notifications\" (\"id\"   SERIAL , \"message\" VARCHAR(255) NOT NULL, \"userId\" INTEGER NOT NULL REFERENCES \"public\".\"Users\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE, \"relatedUserId\" INTEGER NOT NULL REFERENCES \"public\".\"Users\" (\"id\") ON DELETE CASCADE ON UPDATE CASCADE, \"isRead\" BOOLEAN DEFAULT false, \"type\" VARCHAR(255) NOT NULL DEFAULT 'general', \"eventDate\" TIMESTAMP WITH TIME ZONE, \"createdAt\" TIMESTAMP WITH TIME ZONE NOT NULL, \"updatedAt\" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY (\"id\"));",
+  "parameters": {},
+  "stack": "Error\n    at Query.run (D:\\Coding\\employee-management-API\\node_modules\\sequelize\\lib\\dialects\\postgres\\query.js:50:25)\n    at D:\\Coding\\employee-management-API\\node_modules\\sequelize\\lib\\sequelize.js:315:28\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async PostgresQueryInterface.createTable (D:\\Coding\\employee-management-API\\node_modules\\sequelize\\lib\\dialects\\abstract\\query-interface.js:98:12)\n    at async Notification.sync (D:\\Coding\\employee-management-API\\node_modules\\sequelize\\lib\\model.js:942:7)\n    at async Sequelize.sync (D:\\Coding\\employee-management-API\\node_modules\\sequelize\\lib\\sequelize.js:377:9)"
+}
+2024-12-26 01:35:26 [ERROR]: Ошибка синхронизации базы данных: getaddrinfo ENOTFOUND db {
+  "name": "SequelizeHostNotFoundError",
+  "parent": {
+    "errno": -3008,
+    "code": "ENOTFOUND",
+    "syscall": "getaddrinfo",
+    "hostname": "db"
+  },
+  "original": {
+    "errno": -3008,
+    "code": "ENOTFOUND",
+    "syscall": "getaddrinfo",
+    "hostname": "db"
+  },
+  "stack": "SequelizeHostNotFoundError: getaddrinfo ENOTFOUND db\n    at Client._connectionCallback (D:\\Coding\\employee-management-API\\node_modules\\sequelize\\lib\\dialects\\postgres\\connection-manager.js:136:24)\n    at Client._handleErrorWhileConnecting (D:\\Coding\\employee-management-API\\node_modules\\pg\\lib\\client.js:326:19)\n    at Client._handleErrorEvent (D:\\Coding\\employee-management-API\\node_modules\\pg\\lib\\client.js:336:19)\n    at Connection.emit (node:events:519:28)\n    at Socket.reportStreamError (D:\\Coding\\employee-management-API\\node_modules\\pg\\lib\\connection.js:57:12)\n    at Socket.emit (node:events:519:28)\n    at emitErrorNT (node:internal/streams/destroy:169:8)\n    at emitErrorCloseNT (node:internal/streams/destroy:128:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)"
+}

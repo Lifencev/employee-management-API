@@ -1,0 +1,50 @@
+name: Publish Newman Report to GitHub Pages after testing using Docker
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Write secrets to .env
+        run: |
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
+          # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
+          # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
+          # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
+  
+      - name: Docker build
+        run: docker-compose up --build -d
+
+      - name: Run Newman and create Report
+        run: newman run Employee_Management_API.postman_collection.json -r html --reporter-html-export "newman-report.html"
+      
+      - name: Docker down
+        run: docker-compose down -v
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          force_orphan: true
+
