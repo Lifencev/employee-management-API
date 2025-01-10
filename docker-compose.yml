@@ -19,7 +19,6 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   api:
-    build:
     environment:
       PORT: 3000
       JWT_SECRET: ${JWT_SECRET}
