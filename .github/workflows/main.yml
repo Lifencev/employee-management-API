@@ -36,6 +36,9 @@ jobs:
           sudo apt-get install -y docker-compose
           docker-compose up --build -d
 
+      - name: Install Newman Reporter
+        run: npm install -g newman-reporter-html
+        
       - name: Run Newman and create Report
         run: newman run Employee_Management_API.postman_collection.json -r html --reporter-html-export "newman-report.html"
       
