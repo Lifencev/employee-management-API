@@ -40,7 +40,7 @@ jobs:
         run: npm install -g newman-reporter-html
         
       - name: Run Newman and create Report
-        run: newman run Employee_Management_API.postman_collection.json -r html --reporter-html-export "newman-report.html"
-      
+        run: newman run Employee_Management_API.postman_collection.json
+       #-r html --reporter-html-export "newman-report.html"
       - name: Docker down
         run: docker-compose down -v
