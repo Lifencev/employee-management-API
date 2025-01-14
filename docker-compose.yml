@@ -5,9 +5,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: today123456
-      POSTGRES_DB: employee_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
 
     command: '
     -c ssl=on 
@@ -19,14 +19,17 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       PORT: 3000
       JWT_SECRET: ${JWT_SECRET}
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: employee_db
-      DB_USER: postgres
-      DB_PASSWORD: today123456
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       SECRET_WORD: ${SECRET_WORD}
     ports:
       - "3000:3000"

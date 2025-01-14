@@ -1,4 +1,4 @@
-name: Publish Newman Report to GitHub Pages after testing using Docker
+name: Run tests using Docker
 
 on:
   push:
@@ -26,9 +26,9 @@ jobs:
         run: |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
-          # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
-          # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
-          # echo "SECRET_WORD=${{ secrets.SECRET_WORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
   
       - name: Install Docker Compose plugin (v2)
         run: |
@@ -41,13 +41,3 @@ jobs:
       
       - name: Docker down
         run: docker-compose down -v
-
-      - name: Deploy to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: gh-pages
-          force_orphan: true
-
